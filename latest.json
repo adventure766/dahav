@@ -2,7 +2,10 @@
   "version": "1.0.1",
   "date": "2026-08-31",
   "notes": "DAHAV update.",
+  "releaseNotes": [
+    "Changed the DAHAV logo color to blue for update-system testing."
+  ],
   "url": "https://github.com/adventure766/dahav/releases/download/v1.0.1/DAHAV-1.0.1.zip",
-  "sha256": "63cb3a8c93639ac646368c15a64a0d49c57abcf4f4ea1b98f93851777e0effe2",
+  "sha256": "fe3c56c2fb05d99919a9bc77bad2c3a241b8684eaa8f39e15a87b4c4aa3bd1bc",
   "min_version": "1.0.0"
 }
