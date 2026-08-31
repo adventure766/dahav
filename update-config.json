@@ -1,7 +1,7 @@
 {
-  "manifestUrl": "https://raw.githubusercontent.com/dahav/dahav/updates/latest.json",
+  "manifestUrl": "https://raw.githubusercontent.com/adventure766/dahav/updates/latest.json",
   "launcherPort": 8091,
   "requireSignature": false,
-  "releaseOwner": "dahav",
+  "releaseOwner": "adventure766",
   "releaseRepo": "dahav"
 }
