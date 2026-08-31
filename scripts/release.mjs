@@ -181,6 +181,7 @@ const manifest = {
   version,
   date: new Date().toISOString().slice(0, 10),
   notes: "DAHAV update.",
+  releaseNotes: (config.releaseNotes && config.releaseNotes.length ? config.releaseNotes : ["DAHAV " + version + " update."]),
   url: `https://github.com/${config.releaseOwner}/${config.releaseRepo}/releases/download/v${version}/DAHAV-${version}.zip`,
   sha256: hash,
   min_version: "1.0.0",
@@ -208,6 +209,40 @@ if (publish) {
     console.log("latest.json pushed to updates branch.");
   } catch (e) {
     console.error("updates branch push failed (create the branch first with: git checkout -b updates):", e.message);
+  }
+
+  // --- Post-publish verification (steps 9 & 10) --------------------------------
+  // 9) latest.json must point at the release we just created.
+  // 10) The SHA-256 in the manifest must match the GitHub-hosted ZIP.
+  try {
+    const rawUrl = `https://raw.githubusercontent.com/${config.releaseOwner}/${config.releaseRepo}/updates/latest.json`;
+    console.log(`\nVerifying ${rawUrl} …`);
+    const hosted = JSON.parse(await (await fetch(rawUrl)).text());
+    const okVersion = hosted.version === version;
+    const okUrl = hosted.url === manifest.url;
+    console.log(`  version ${hosted.version} (expect ${version}): ${okVersion ? "OK" : "MISMATCH"}`);
+    console.log(`  url     ${hosted.url}: ${okUrl ? "OK" : "MISMATCH"}`);
+    if (okVersion && okUrl && hosted.sha256) {
+      const tmp = resolve(require("node:os").tmpdir(), `dahav-verify-${Date.now()}.zip`);
+      try {
+        const resp = await fetch(hosted.url);
+        if (resp.ok) {
+          const buf = Buffer.from(await resp.arrayBuffer());
+          const h = createHash("sha256").update(buf).digest("hex");
+          const okHash = h === hosted.sha256;
+          console.log(`  sha256 ${h}: ${okHash ? "OK (matches hosted ZIP)" : "MISMATCH"}`);
+          if (!okHash) console.error("  WARNING: checksum mismatch — clients will refuse this update.");
+        } else {
+          console.error(`  WARNING: could not download hosted ZIP (HTTP ${resp.status}).`);
+        }
+      } finally {
+        rmSync(tmp, { force: true });
+      }
+    } else {
+      console.error("  WARNING: hosted manifest does not match this release.");
+    }
+  } catch (e) {
+    console.error("  Verification failed:", e.message);
   }
 }
 

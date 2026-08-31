@@ -3,5 +3,8 @@
   "launcherPort": 8091,
   "requireSignature": false,
   "releaseOwner": "adventure766",
-  "releaseRepo": "dahav"
+  "releaseRepo": "dahav",
+  "releaseNotes": [
+    "Changed the DAHAV logo color to blue for update-system testing."
+  ]
 }

@@ -14,6 +14,7 @@ export interface UpdateStatus {
   hasUpdate: boolean;
   force: boolean;
   notes?: string;
+  releaseNotes?: string[];
   staged: boolean;
   applying: boolean;
   applyResult?: { ok: boolean; version?: string; rolledBack?: boolean; error?: string } | null;

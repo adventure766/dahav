@@ -53,6 +53,7 @@ $Script:PocketBasePid = $null
 $Script:PbOwned = $false
 $Script:StopRequested = $false
 $Script:LastApply = $null         # result of the last apply attempt
+$Script:CheckJob = $null          # background update-check job (see Start-UpdateCheckJob)
 
 function Write-Log($msg) {
   $line = "[{0}] {1}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $msg
@@ -200,7 +201,45 @@ function Resolve-ManifestUrl {
   if ($ManifestUrl) { return $ManifestUrl }
   $cfg = Read-JsonFile $ConfigFile
   if ($cfg -and $cfg.manifestUrl) { return $cfg.manifestUrl }
-  return "https://raw.githubusercontent.com/dahav/dahav/updates/latest.json"
+  return "https://raw.githubusercontent.com/adventure766/dahav/updates/latest.json"
+}
+
+# --- update check job (shared by launch, periodic re-check, and on-demand) -----
+# Downloads the manifest, compares versions, downloads + SHA-256 verifies the
+# release zip, and returns @{ latest; zip }. Runs in a background job so a slow
+# or failed network call never blocks the HTTP API.
+function Start-UpdateCheckJob {
+  $manifestUrl = Resolve-ManifestUrl
+  $currentVersion = $Script:CurrentVersion
+  $job = Start-Job -ScriptBlock {
+    param($manifestUrl, $currentVersion)
+    $latest = $null
+    try {
+      $r = Invoke-WebRequest -Uri $manifestUrl -UseBasicParsing -TimeoutSec 20
+      if ($r.StatusCode -eq 200) { $latest = $r.Content | ConvertFrom-Json }
+    } catch { $latest = $null }
+    if (-not $latest -or -not $latest.version) { return @{ latest = $null; zip = $null } }
+    $cmp = [math]::Sign(([version]$latest.version).CompareTo([version]$currentVersion))
+    if ($cmp -le 0) { return @{ latest = $latest; zip = $null } }
+    # download + verify
+    $zip = $null
+    try {
+      $dir = Join-Path $env:TEMP "dahav-stage"
+      New-Item -ItemType Directory -Force -Path $dir | Out-Null
+      $path = Join-Path $dir ("dahav-" + $latest.version + ".zip")
+      Invoke-WebRequest -Uri $latest.url -OutFile $path -UseBasicParsing -TimeoutSec 300
+      if ($latest.sha256) {
+        $h = (Get-FileHash -Path $path -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($h -ne $latest.sha256.ToLowerInvariant()) {
+          Remove-Item $path -Force -ErrorAction SilentlyContinue
+          return @{ latest = $latest; zip = $null }
+        }
+      }
+      $zip = $path
+    } catch { $zip = $null }
+    return @{ latest = $latest; zip = $zip }
+  } -ArgumentList $manifestUrl, $currentVersion
+  return $job
 }
 
 # --- apply ---------------------------------------------------------------------
@@ -336,6 +375,7 @@ function Get-StatusObject {
   $hasUpdate = $false
   $latest = ""
   $notes = ""
+  $releaseNotes = @()
   $force = $false
   if ($Script:Latest -and $Script:Latest.version) {
     $cmp = Compare-Version $Script:CurrentVersion $Script:Latest.version
@@ -343,6 +383,7 @@ function Get-StatusObject {
       $hasUpdate = $true
       $latest = $Script:Latest.version
       $notes = $Script:Latest.notes
+      if ($Script:Latest.releaseNotes) { $releaseNotes = @($Script:Latest.releaseNotes) }
       if ($Script:Latest.min_version -and (Compare-Version $Script:CurrentVersion $Script:Latest.min_version) -lt 0) {
         $force = $true
       }
@@ -355,6 +396,7 @@ function Get-StatusObject {
     hasUpdate = $hasUpdate
     force = $force
     notes = $notes
+    releaseNotes = $releaseNotes
     staged = [bool]$Script:StagedZip
     applying = $Script:Applying
     applyResult = $Script:LastApply
@@ -386,6 +428,14 @@ function Handle-Request($ctx) {
     return
   }
   if ($path -eq "/status" -and $method -eq "GET") {
+    # On-demand update discovery: if we have not yet learned the latest version
+    # (e.g. DAHAV was launched while offline, or the launch check is still
+    # running), kick off a check so the Dashboard banner can appear without a
+    # restart. Reuses the existing update-check job; never a second updater.
+    if (-not $Script:Latest -and -not $Script:CheckJob -and -not $Script:Applying) {
+      $Script:CheckJob = Start-UpdateCheckJob
+      Write-Log "On-demand update check started (first /status after launch)."
+    }
     Send-Json $ctx (Get-StatusObject)
     return
   }
@@ -437,6 +487,31 @@ function Main {
       Write-Log "PocketBase already running - attaching."
       $Script:PbOwned = $false
     } else {
+      # Guard against the "fresh extraction instead of in-place update" failure
+      # mode: a normal install ships with VERSION set to the installed release
+      # (e.g. 1.0.0) and pb_data is created by first-run. If the VERSION file
+      # claims a NEWER build but pb_data/data.db is missing, this is almost
+      # certainly a release zip that was unzipped into a brand-new folder
+      # instead of updating the existing installation - proceeding with
+      # first-run would silently create an empty database and orphan the
+      # client's real data.
+      $initialVersion = "1.0.0"
+      $versionLooksNewer = $false
+      if ($Script:CurrentVersion -and (Compare-Version $Script:CurrentVersion $initialVersion) -gt 0) {
+        $versionLooksNewer = $true
+      }
+      if ($versionLooksNewer -and (Test-PbDataEmpty)) {
+        Write-Log "============================================================"
+        Write-Log "WARNING: VERSION file says $($Script:CurrentVersion) but pb_data/data.db is MISSING."
+        Write-Log "This looks like a FRESH EXTRACTION of a release zip into a new folder,"
+        Write-Log "not an in-place update of an existing installation."
+        Write-Log "Your existing business data is probably in the pb_data of your"
+        Write-Log "previous DAHAV folder (e.g. the previous installation directory)."
+        Write-Log "Check that you launched DAHAV from the SAME folder as before before"
+        Write-Log "creating a new database here."
+        Write-Log "Install root in use: $Root"
+        Write-Log "============================================================"
+      }
       if (Test-PbDataEmpty) {
         Write-Log "First run detected (no pb_data/data.db)."
         Invoke-FirstRun
@@ -472,34 +547,7 @@ function Main {
   # API comes up immediately and a slow/incomplete download never blocks it.
   # The job result is collected in the supervisor loop below.
   $Script:Latest = $null
-  $checkJob = Start-Job -ScriptBlock {
-    param($manifestUrl, $currentVersion)
-    $latest = $null
-    try {
-      $r = Invoke-WebRequest -Uri $manifestUrl -UseBasicParsing -TimeoutSec 20
-      if ($r.StatusCode -eq 200) { $latest = $r.Content | ConvertFrom-Json }
-    } catch { $latest = $null }
-    if (-not $latest -or -not $latest.version) { return @{ latest = $null; zip = $null } }
-    $cmp = [math]::Sign(([version]$latest.version).CompareTo([version]$currentVersion))
-    if ($cmp -le 0) { return @{ latest = $latest; zip = $null } }
-    # download + verify
-    $zip = $null
-    try {
-      $dir = Join-Path $env:TEMP "dahav-stage"
-      New-Item -ItemType Directory -Force -Path $dir | Out-Null
-      $path = Join-Path $dir ("dahav-" + $latest.version + ".zip")
-      Invoke-WebRequest -Uri $latest.url -OutFile $path -UseBasicParsing -TimeoutSec 300
-      if ($latest.sha256) {
-        $h = (Get-FileHash -Path $path -Algorithm SHA256).Hash.ToLowerInvariant()
-        if ($h -ne $latest.sha256.ToLowerInvariant()) {
-          Remove-Item $path -Force -ErrorAction SilentlyContinue
-          return @{ latest = $latest; zip = $null }
-        }
-      }
-      $zip = $path
-    } catch { $zip = $null }
-    return @{ latest = $latest; zip = $zip }
-  } -ArgumentList (Resolve-ManifestUrl), $Script:CurrentVersion
+  $Script:CheckJob = Start-UpdateCheckJob
 
   # HTTP API
   $listener = Start-HttpListener
@@ -524,18 +572,26 @@ function Main {
       }
 
       # collect the launch-time update check result
-      if ($checkJob -and $checkJob.State -eq "Completed") {
+      if ($Script:CheckJob -and $Script:CheckJob.State -eq "Completed") {
         try {
-          $res = Receive-Job $checkJob
-          Remove-Job $checkJob -Force -ErrorAction SilentlyContinue
-          $checkJob = $null
+          $res = Receive-Job $Script:CheckJob
+          Remove-Job $Script:CheckJob -Force -ErrorAction SilentlyContinue
+          $Script:CheckJob = $null
           if ($res -and $res.latest -and $res.latest.version) {
             $Script:Latest = $res.latest
-            if ($res.zip) {
-              $Script:StagedZip = $res.zip
-              Write-Log "Staged update $($res.latest.version) ready at $($res.zip)"
+            # Only treat the manifest version as "an update" when it is strictly
+            # NEWER than the running version. When they are equal (or the manifest
+            # is older), the check is simply "up to date" - no misleading message.
+            $isNewer = (Compare-Version $Script:CurrentVersion $res.latest.version) -lt 0
+            if ($isNewer) {
+              if ($res.zip) {
+                $Script:StagedZip = $res.zip
+                Write-Log "Staged update $($res.latest.version) ready at $($res.zip)"
+              } else {
+                Write-Log "Update $($res.latest.version) available but not staged (offline or checksum failed)."
+              }
             } else {
-              Write-Log "Update $($res.latest.version) available but not staged (offline or checksum failed)."
+              Write-Log "DAHAV is up to date (current $($Script:CurrentVersion), latest $($res.latest.version))."
             }
           }
         } catch {
@@ -544,35 +600,9 @@ function Main {
       }
 
       # periodic update re-check every 30 minutes — reuse the same job slot
-      if (-not $checkJob -and (Get-Date) -gt $lastCheck.AddMinutes(30)) {
+      if (-not $Script:CheckJob -and (Get-Date) -gt $lastCheck.AddMinutes(30)) {
         $lastCheck = Get-Date
-        $checkJob = Start-Job -ScriptBlock {
-          param($manifestUrl, $currentVersion)
-          $latest = $null
-          try {
-            $r = Invoke-WebRequest -Uri $manifestUrl -UseBasicParsing -TimeoutSec 20
-            if ($r.StatusCode -eq 200) { $latest = $r.Content | ConvertFrom-Json }
-          } catch { $latest = $null }
-          if (-not $latest -or -not $latest.version) { return @{ latest = $null; zip = $null } }
-          $cmp = [math]::Sign(([version]$latest.version).CompareTo([version]$currentVersion))
-          if ($cmp -le 0) { return @{ latest = $latest; zip = $null } }
-          $zip = $null
-          try {
-            $dir = Join-Path $env:TEMP "dahav-stage"
-            New-Item -ItemType Directory -Force -Path $dir | Out-Null
-            $path = Join-Path $dir ("dahav-" + $latest.version + ".zip")
-            Invoke-WebRequest -Uri $latest.url -OutFile $path -UseBasicParsing -TimeoutSec 300
-            if ($latest.sha256) {
-              $h = (Get-FileHash -Path $path -Algorithm SHA256).Hash.ToLowerInvariant()
-              if ($h -ne $latest.sha256.ToLowerInvariant()) {
-                Remove-Item $path -Force -ErrorAction SilentlyContinue
-                return @{ latest = $latest; zip = $null }
-              }
-            }
-            $zip = $path
-          } catch { $zip = $null }
-          return @{ latest = $latest; zip = $zip }
-        } -ArgumentList (Resolve-ManifestUrl), $Script:CurrentVersion
+        $Script:CheckJob = Start-UpdateCheckJob
       }
 
       # serve HTTP — blocking GetContext(); health + update checks run on their

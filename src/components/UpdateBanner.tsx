@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { RefreshCw, X } from "lucide-react";
+import { RefreshCw, X, Sparkles } from "lucide-react";
 import {
   APP_VERSION,
   getStatus,
@@ -83,16 +83,23 @@ export function UpdateBanner() {
     }
   }
 
+  const notes = status?.releaseNotes && status.releaseNotes.length > 0
+    ? status.releaseNotes
+    : status?.notes
+      ? [status.notes]
+      : [];
+
   return (
     <div className="update-banner" role="status">
-      <div className="update-banner-icon"><RefreshCw size={16} /></div>
+      <div className="update-banner-icon"><Sparkles size={16} /></div>
       <div className="update-banner-body">
-        <strong>DAHAV update available</strong>
-        <span>
-          Current version {APP_VERSION} → New version {status?.latest || "?"}
-          {status?.force ? " (required)" : ""}
-        </span>
-        {status?.notes ? <span className="update-banner-notes">{status.notes}</span> : null}
+        <strong>DAHAV update available — v{status?.latest || "?"}</strong>
+        <span>Current version {APP_VERSION} → New version {status?.latest || "?"}</span>
+        {notes.length > 0 && (
+          <ul className="update-banner-notes">
+            {notes.map((n, i) => <li key={i}>{n}</li>)}
+          </ul>
+        )}
         {error && <span className="update-banner-error">{error}</span>}
       </div>
       <div className="update-banner-actions">
