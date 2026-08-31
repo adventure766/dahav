@@ -859,6 +859,43 @@ routerAdd("PATCH", "/api/dahav/records/products/{id}", (c) => {
   }
 });
 
+// --- FIFO consistency: opening stock on product create ---
+// A product created with an initial `stock` (e.g. the "Opening Stock" field
+// in the products page) writes products.stock directly, but the FIFO engine
+// only knows about inventory_layers. Without a matching layer every sale of
+// that stock would fail with "Insufficient FIFO inventory layers". Create one
+// opening-stock layer at the product's unit_cost so stock and layers agree
+// from the moment the product exists.
+//
+// Registered BEFORE the audit hook below: hook handlers share the event chain
+// and a handler that returns without calling e.next() stops later handlers,
+// so this must run first to guarantee the layer is created.
+//
+// NOTE: inside this model hook `e.app` is a transaction proxy — it has no
+// authStore(), so the layer's `by` field is left empty (it is informational
+// only; the opening layer is attributed to the product create action).
+onRecordAfterCreateSuccess((e) => {
+  try {
+    const rec = e.record;
+    const stock = Math.floor(Number(rec.get("stock")) || 0);
+    if (stock > 0) {
+      const calc = require(`${__hooks}/lib/calc.cjs`);
+      calc.addFifoLayer(e.app, {
+        product_id: rec.id,
+        quantity: stock,
+        unit_cost: Number(rec.get("unit_cost")) || 0,
+        reference: "opening-" + rec.id,
+        notes: "Opening stock from product creation",
+        by: "",
+      });
+    }
+  } catch (err) {
+    // Never fail product creation because of layer bookkeeping.
+    console.log("FIFO opening layer creation failed:", String(err && err.message || err));
+  }
+  e.next();
+}, "products");
+
 // --- audit: track creates on important records ---
 onRecordAfterCreateSuccess((e) => {
   const tracked = ["transactions", "payments", "sales", "expenses", "payroll", "damage_records", "receipts", "inventory_movements", "invoices", "sale_items"];

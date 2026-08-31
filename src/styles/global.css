@@ -779,7 +779,13 @@ td.money { font-variant-numeric: tabular-nums; text-align: right; white-space: n
 }
 .cart-items { flex: 1; overflow-y: auto; padding: 12px; }
 .cart-line { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
-.cart-line .name { flex: 1; font-weight: 600; font-size: 14px; }
+.cart-line-main { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cart-line .name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+.price-badge { font-size: 10px; padding: 1px 6px; }
+.price-edit { display: flex; align-items: center; gap: 6px; }
+.price-edit .muted { min-width: 56px; }
+.price-edit input { width: 84px; padding: 2px 6px; font-size: 13px; font-variant-numeric: tabular-nums; }
+.price-edit input.custom-price-input { border-color: var(--accent, #1d4ed8); background: #eff6ff; font-weight: 700; }
 .cart-line .qty { display: flex; align-items: center; gap: 6px; }
 .qty-btn { width: 32px; height: 32px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-weight: 700; }
 .cart-totals { padding: 12px; border-top: 1px solid var(--border); }

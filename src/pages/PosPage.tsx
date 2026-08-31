@@ -23,6 +23,10 @@ interface Customer { id: string; name: string; }
 interface CartLine {
   product: Product;
   quantity: number;
+  /** Optional per-sale unit price override. When set, this line is sold at
+   *  this price for this transaction only; the product's default price is
+   *  never modified. */
+  unit_price?: number;
 }
 
 interface CheckoutResult {
@@ -76,7 +80,7 @@ export function PosPage() {
   }, [useCustomRate, customRate, defaultRate]);
 
   const totals = useMemo(() => {
-    return cartTotals(cart.map((l) => ({ unit_price: l.product.unit_price, quantity: l.quantity })));
+    return cartTotals(cart.map((l) => ({ unit_price: l.unit_price ?? l.product.unit_price, quantity: l.quantity })));
   }, [cart]);
 
   const paymentPreview = useMemo(() => {
@@ -114,6 +118,18 @@ export function PosPage() {
     });
   };
 
+  /** Set a per-sale unit price override for a cart line. Empty/invalid values
+   *  revert to the product's default price. The product master price is never
+   *  touched — the override lives only on this cart line for this transaction. */
+  const setUnitPrice = (id: string, value: string) => {
+    setCart((prev) => prev.map((l) => {
+      if (l.product.id !== id) return l;
+      const n = Number(value);
+      if (value === "" || !(n > 0)) return { ...l, unit_price: undefined };
+      return { ...l, unit_price: n };
+    }));
+  };
+
   const removeLine = (id: string) => setCart((prev) => prev.filter((l) => l.product.id !== id));
 
   const checkout = async () => {
@@ -122,7 +138,11 @@ export function PosPage() {
     const r = await api<CheckoutResult>("/api/dahav/pos/checkout", {
       method: "POST",
       body: {
-        items: cart.map((l) => ({ product_id: l.product.id, quantity: l.quantity })),
+        items: cart.map((l) => ({
+          product_id: l.product.id,
+          quantity: l.quantity,
+          ...(l.unit_price !== undefined ? { unit_price: l.unit_price } : {}),
+        })),
         customer_id: customerId || undefined,
         payment_method: "cash",
         payment_currency: paymentCurrency,
@@ -184,13 +204,41 @@ export function PosPage() {
           <h3 style={{ margin: "0 0 8px" }}>Cart</h3>
           {cart.map((l) => (
             <div className="cart-line" key={l.product.id}>
-              <div className="name">{l.product.name}</div>
+              <div className="cart-line-main">
+                <div className="name">
+                  {l.product.name}
+                  {l.unit_price !== undefined && <span className="badge blue price-badge">custom</span>}
+                </div>
+                <div className="price-edit">
+                  <span className="muted small">Unit price</span>
+                  <input
+                    className={l.unit_price !== undefined ? "custom-price-input" : ""}
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder={String(l.product.unit_price)}
+                    defaultValue=""
+                    key={l.product.id + "-" + (l.unit_price ?? "")}
+                    onChange={(e) => setUnitPrice(l.product.id, e.target.value)}
+                    aria-label={`Unit price for ${l.product.name}`}
+                  />
+                  {l.unit_price !== undefined && (
+                    <button
+                      className="btn small ghost"
+                      onClick={() => setUnitPrice(l.product.id, "")}
+                      aria-label="Reset price to default"
+                    >
+                      <X size={13} />
+                    </button>
+                  )}
+                </div>
+              </div>
               <div className="qty">
                 <button className="qty-btn" onClick={() => setQty(l.product.id, l.quantity - 1)} aria-label="Decrease quantity"><Minus size={15} /></button>
                 <span>{l.quantity}</span>
                 <button className="qty-btn" onClick={() => setQty(l.product.id, l.quantity + 1)} aria-label="Increase quantity"><Plus size={15} /></button>
               </div>
-              <div className="money-usd">{usd(l.product.unit_price * l.quantity)}</div>
+              <div className="money-usd">{usd((l.unit_price ?? l.product.unit_price) * l.quantity)}</div>
               <button className="btn small ghost" onClick={() => removeLine(l.product.id)} aria-label="Remove item"><X size={15} /></button>
             </div>
           ))}

@@ -175,10 +175,21 @@ function executePosCheckout(app, input) {
     if (Number(p.get("stock")) < qty) {
       throw new Error(`Insufficient stock for ${p.get("name")}`);
     }
+    // A per-sale unit price override (e.g. customer-specific pricing) may be
+    // supplied by the client. When present it is used for THIS sale only and
+    // never writes back to the product's master unit_price. Default price is
+    // used otherwise so the product's normal price stays unchanged.
+    let unitPrice = Number(p.get("unit_price")) || 0;
+    if (it.unit_price !== undefined && it.unit_price !== null && it.unit_price !== "") {
+      unitPrice = Number(it.unit_price);
+      if (!(unitPrice > 0)) {
+        throw new Error(`Invalid unit price for ${p.get("name")}`);
+      }
+    }
     items.push({
       product: p,
       quantity: qty,
-      unit_price: Number(p.get("unit_price")) || 0,
+      unit_price: unitPrice,
       unit_cost: Number(p.get("unit_cost")) || 0,
     });
   }
@@ -832,6 +843,7 @@ module.exports = {
   VERSION: 6,
   createLedger,
   applyStockMovement,
+  addFifoLayer,
   executePosCheckout,
   createReceipt,
   executeExpense,
