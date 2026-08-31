@@ -1,0 +1,16 @@
+node_modules/
+dist/
+pb_data/
+pb_migrations_dev/
+release/
+tests/update-env/
+data/
+*.log
+.DS_Store
+.env
+.env.local
+
+# Local agent/tool state — never publish
+.commandcode/
+$COMMANDCODE_SCRATCHPAD/
+*commandcode*/

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary Meta Tags -->
+    <meta name="description" content="Open Source backend in 1 file with realtime database, authentication, file storage and admin dashboard">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="PocketBase - Open Source backend in 1 file">
+    <meta property="og:description" content="Open Source backend in 1 file with realtime database, authentication, file storage and admin dashboard">
+    <meta property="og:image" content="/images/og.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="PocketBase - Open Source backend in 1 file">
+    <meta property="twitter:description" content="Open Source backend in 1 file with realtime database, authentication, file storage and admin dashboard">
+    <meta property="twitter:image" content="/images/og.png">
+
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/images/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#000000">
+    <link rel="shortcut icon" href="/images/favicon/favicon.ico">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-config" content="/images/favicon/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- preload -->
+    <link rel="preload" href="/fonts/source-sans-pro/source-sans-pro-v18-latin_cyrillic-regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/source-sans-pro/source-sans-pro-v18-latin_cyrillic-600.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/source-sans-pro/source-sans-pro-v18-latin_cyrillic-700.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/source-sans-pro/source-sans-pro-v18-latin_cyrillic-italic.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/ubuntu-mono/ubuntu-mono-v17-cyrillic_latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+
+    <script>
+        // CSS3 animations support check
+        (function () {
+            if (typeof document === "undefined") {
+                return; // serverside rendering
+            }
+
+            let elem = document.createElement("div");
+            let hasAnimation = elem.style.animationName !== undefined;
+
+            if (!hasAnimation) {
+                document.documentElement.classList.add("no-animations");
+            }
+        })();
+    </script>
+
+    <script>
+        // silent svelte console errors
+        if (typeof window === "undefined") {
+            window = {};
+        }
+        window.Prism = window.Prism || {};
+        window.Prism.manual = true;
+
+        if (typeof navigator !== "undefined" && navigator.userAgentData) {
+            navigator.userAgentData.getHighEntropyValues([
+                "architecture",
+            ]).then((ua) => {
+                window.UA_ARCHITECTURE = ua.architecture
+            });
+        }
+    </script>
+
+    
+		<link href="../../_app/immutable/assets/2.CShZuLqV.css" rel="stylesheet">
+		<link href="../../_app/immutable/assets/main.DgakXc13.css" rel="stylesheet">
+		<link href="../../_app/immutable/assets/3.BJdqDXbV.css" rel="stylesheet">
+		<link href="../../_app/immutable/assets/CodeBlock.CoG5ZhIt.css" rel="stylesheet">
+		<link rel="modulepreload" href="../../_app/immutable/entry/start.D2fjbJ_a.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/entry.BTpAyq61.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/scheduler.DQkMsCme.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/index.DXzOHq6C.js">
+		<link rel="modulepreload" href="../../_app/immutable/entry/app.CiOhnQKG.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/index.DidmSOuj.js">
+		<link rel="modulepreload" href="../../_app/immutable/nodes/0.hNR2-YDE.js">
+		<link rel="modulepreload" href="../../_app/immutable/nodes/2.C4XqU5kH.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/PageFooter.CcvJa5Tx.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/CommonHelper.ucxL7p6H.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/preferences.DKIoM6dL.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/tooltip.RC_5fCRL.js">
+		<link rel="modulepreload" href="../../_app/immutable/nodes/3.CkpizogZ.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/stores.DmKTyTud.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/each.DStbqIFS.js">
+		<link rel="modulepreload" href="../../_app/immutable/nodes/48.BuvGGyKP.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/HeadingLink.DDyitwi-.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/Toc.Bk0cdD5b.js">
+		<link rel="modulepreload" href="../../_app/immutable/chunks/CodeBlock.DLjOsXzZ.js"><title>Extend with JavaScript - Overview - Docs - PocketBase</title><!-- HEAD_svelte-1az7yaz_START --><!-- HEAD_svelte-1az7yaz_END -->
+
+    <script src="/pagefind/pagefind-ui.js"></script>
+</head>
+<body>
+    <div class="page-body">  <header class="page-header"><div class="wrapper wrapper-lg"><div class="header-section left"><a href="/" class="logo logo-sm" data-sveltekit-preload-data><img src="/images/logo.svg" alt="PocketBase logo" width="40" height="40"> <span class="txt" data-svelte-h="svelte-omx7fd">Pocket<strong>Base</strong></span> <span class="version">v0.40.1</span></a></div> <div class="header-section center"> <div tabindex="-1" class="form-field searchbar"><div class="form-field-addon prefix" data-svelte-h="svelte-4xuxr"><i class="ri-search-line"></i></div>  <input type="text" class="searchbar-input" placeholder="Search..." value=""> <div tabindex="-1" class="dropdown searchbar-dropdown"><div class="tabs-header compact"><button type="button" class="tab-item" data-svelte-h="svelte-1gcu78o">Go</button> <button type="button" class="tab-item active" data-svelte-h="svelte-1oz4ee9">JavaScript</button></div>  <div id="pagefind_searchBUzUp"></div></div></div></div> <div class="header-section right"><button type="button" class="btn btn-circle btn-secondary responsive-menu-btn" title="Menu"><span></span> <i class="ri-menu-3-fill"></i>  <div class="toggler-container" tabindex="-1" role="menu"></div></button> <nav class="main-menu" data-svelte-h="svelte-1w5krcj"><a href="/faq" class="btn btn-secondary" data-sveltekit-preload-data>FAQ</a> <a href="https://github.com/pocketbase/pocketbase" class="btn btn-circle btn-secondary" target="_blank" rel="noreferrer noopener" title="GitHub Repo"><i class="ri-github-line"></i></a> <a href="/docs" class="btn btn-outline" data-sveltekit-preload-data><span class="txt">Documentation</span></a></nav></div></div></header> <main class="wrapper wrapper-lg page-content-wrapper"> <aside class="page-sidebar highlight docs-sidebar"><div class="sticky-wrapper svelte-kkdbbm"><div class="sidebar-content"><nav class="sidebar-list">  <a href="/docs" class="list-item"> <span class="icon"><i class="ri-home-2-line"></i></span> <span class="txt">Introduction</span> </a>   <a href="/docs/going-to-production" class="list-item"> <span class="icon"><i class="ri-check-double-line"></i></span> <span class="txt">Going to production</span> </a>   <a href="/docs/api-records" class="list-item"> <span class="icon"><i class="ri-file-list-2-line"></i></span> <span class="txt">Web APIs reference</span> </a> </nav> <div class="clearfix m-t-base"></div> <div class="sidebar-bg-section"><div class="tabs-header stretched compact"><a class="tab-item" href="/docs/go-overview" data-svelte-h="svelte-1qkrccu"><div class="block">Extend with
+                            <br> <strong>Go</strong></div></a> <a class="tab-item active" href="/docs/js-overview" data-svelte-h="svelte-qrgnnx"><div class="block">Extend with
+                            <br> <strong>JavaScript</strong></div></a></div> <div class="tabs-content"><div class="tab-item"><nav class="sidebar-list">  <a href="/docs/go-overview" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Overview</span> </a>   <a href="/docs/go-event-hooks" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Event hooks</span> </a>   <a href="/docs/go-routing" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Routing</span> </a>   <a href="/docs/go-database" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Database</span> </a>   <a href="/docs/go-records" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Record operations</span> </a>   <a href="/docs/go-collections" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Collection operations</span> </a>   <a href="/docs/go-migrations" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Migrations</span> </a>   <a href="/docs/go-jobs-scheduling" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Jobs scheduling</span> </a>   <a href="/docs/go-sending-emails" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Sending emails</span> </a>   <a href="/docs/go-rendering-templates" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Rendering templates</span> </a>   <a href="/docs/go-console-commands" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Console commands</span> </a>   <a href="/docs/go-realtime" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Realtime messaging</span> </a>   <a href="/docs/go-filesystem" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Filesystem</span> </a>   <a href="/docs/go-logging" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Logging</span> </a>   <a href="/docs/go-testing" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Testing</span> </a>   <a href="/docs/go-miscellaneous" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Miscellaneous</span> </a>   <a href="/docs/go-record-proxy" class="list-item"><span class="label label-sm label-info svelte-kkdbbm" data-svelte-h="svelte-w71e23">Go</span>  <span class="txt">Record proxy</span> </a> </nav></div> <div class="tab-item active"><nav class="sidebar-list">  <a href="/docs/js-overview" class="list-item active"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Overview</span> </a>   <a href="/docs/js-event-hooks" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Event hooks</span> </a>   <a href="/docs/js-routing" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Routing</span> </a>   <a href="/docs/js-database" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Database</span> </a>   <a href="/docs/js-records" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Record operations</span> </a>   <a href="/docs/js-collections" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Collection operations</span> </a>   <a href="/docs/js-migrations" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Migrations</span> </a>   <a href="/docs/js-jobs-scheduling" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Jobs scheduling</span> </a>   <a href="/docs/js-sending-emails" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Sending emails</span> </a>   <a href="/docs/js-rendering-templates" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Rendering templates</span> </a>   <a href="/docs/js-console-commands" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Console commands</span> </a>   <a href="/docs/js-sending-http-requests" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Sending HTTP requests</span> </a>   <a href="/docs/js-realtime" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Realtime messaging</span> </a>   <a href="/docs/js-filesystem" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Filesystem</span> </a>   <a href="/docs/js-logging" class="list-item"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Logging</span> </a>   <a href="/jsvm/index.html" class="list-item" target="_blank" rel="noopener noreferrer"><span class="label label-sm label-warning svelte-kkdbbm" data-svelte-h="svelte-13cfr2c">JS</span>  <span class="txt">Types reference</span> </a> </nav></div></div></div></div></div> </aside> <div class="page-content"><nav class="breadcrumbs"><div class="breadcrumb-item">Extend with JavaScript - Overview</div></nav> <div class="content" data-pagefind-body data-tag-javascript="javascript" data-tag-go="go" data-tag-other="other" data-pagefind-filter="tag[data-tag-javascript],tag[data-tag-other]"><span class="hidden" data-pagefind-meta="title">Overview</span> <div class="toc"><ul class="toc-list-1"></ul></div> <h3 id="javascript-engine" class="heading-link "><a href="#javascript-engine" class="link-primary"> JavaScript engine </a></h3> <p data-svelte-h="svelte-1bfl4sl">The prebuilt PocketBase v0.17+ executable comes with embedded ES5 JavaScript engine (<a href="https://github.com/dop251/goja" target="_blank" rel="nopppener noreferrer">goja</a>) which enables you to write custom server-side code using plain JavaScript.</p> <p data-svelte-h="svelte-uthmak">You can start by creating <code>*.pb.js</code> file(s) inside a <code>pb_hooks</code>
+    directory next to your executable.</p> <div class="code-wrapper m-b-sm prism-light svelte-1qrji6i"><code class="svelte-1qrji6i"><!-- HTML_TAG_START --><span class="token comment">// pb_hooks/main.pb.js</span>
+
+<span class="token function">routerAdd</span><span class="token punctuation">(</span><span class="token string">"GET"</span><span class="token punctuation">,</span> <span class="token string">"/hello/{name}"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">e</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    <span class="token keyword">let</span> name <span class="token operator">=</span> e<span class="token punctuation">.</span>request<span class="token punctuation">.</span><span class="token function">pathValue</span><span class="token punctuation">(</span><span class="token string">"name"</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> e<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token string-property property">"message"</span><span class="token operator">:</span> <span class="token string">"Hello "</span> <span class="token operator">+</span> name <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+<span class="token function">onRecordAfterUpdateSuccess</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">e</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"user updated..."</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span>record<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"email"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    e<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">"users"</span><span class="token punctuation">)</span><!-- HTML_TAG_END --></code> </div> <p data-svelte-h="svelte-nppfkr"><em>For convenience, when making changes to the files inside <code>pb_hooks</code>, the process will
+        automatically restart/reload itself (currently supported only on UNIX based platforms). The
+        <code>*.pb.js</code> files are loaded per their filename sort order.</em></p> <p data-svelte-h="svelte-8coe09">For most parts, the JavaScript APIs are derived from <a href="/docs/go-overview">Go</a> with 2 main differences:</p> <ul data-svelte-h="svelte-a8q9zv"><li>Go exported method and field names are converted to camelCase, for example:
+        <br> <code>app.FindRecordById(&quot;example&quot;, &quot;RECORD_ID&quot;)</code> becomes
+        <code>$app.findRecordById(&quot;example&quot;, &quot;RECORD_ID&quot;)</code>.</li> <li>Errors are thrown as regular JavaScript exceptions and not returned as Go values.</li></ul> <h5 id="global-objects" class="heading-link "><a href="#global-objects" class="link-primary"> Global objects </a></h5> <p data-svelte-h="svelte-11bg0uz">Below is a list with some of the commonly used global objects that are accessible from everywhere:</p> <ul data-svelte-h="svelte-109hhfv"><li><a href="/jsvm/variables/__hooks.html" target="_blank"><code>__hooks</code></a>
+        - The absolute path to the app <code>pb_hooks</code> directory.</li> <li><a href="/jsvm/modules/_app.html" target="_blank"><code>$app</code></a> - The current running PocketBase application instance.</li> <li><a href="/jsvm/modules/_apis.html" target="_blank"><code>$apis.*</code></a> - API routing helpers and middlewares.</li> <li><a href="/jsvm/modules/_os.html" target="_blank"><code>$os.*</code></a> - OS level primitives (deleting directories, executing shell commands, etc.).</li> <li><a href="/jsvm/modules/_security.html" target="_blank"><code>$security.*</code></a> - Low level helpers for creating and parsing JWTs, random string generation, AES encryption, etc.</li> <li class="txt-bold">And many more - for all exposed APIs, please refer to the
+        <a href="/jsvm/index.html" target="_blank">JSVM reference docs</a>.</li></ul> <h3 id="typescript-declarations-and-code-completion" class="heading-link "><a href="#typescript-declarations-and-code-completion" class="link-primary"> TypeScript declarations and code completion </a></h3> <p data-svelte-h="svelte-1kt0r8n">While you can&#39;t use directly TypeScript (<em>without transpiling it to JS on your own</em>), PocketBase
+    comes with builtin <strong>ambient TypeScript declarations</strong> that can help providing information
+    and documentation about the available global variables, methods and arguments, code completion, etc. as
+    long as your editor has TypeScript LSP support
+    <em>(most editors either have it builtin or available as plugin)</em>.</p> <p data-svelte-h="svelte-bz5kr2">The types declarations are stored in
+    <code>pb_data/types.d.ts</code> file. You can point to those declarations using the
+    <a href="https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html#-reference-path-" target="_blank" rel="noopener">reference triple-slash directive</a>
+    at the top of your JS file:</p> <div class="code-wrapper m-b-sm prism-light svelte-1qrji6i"><code class="svelte-1qrji6i"><!-- HTML_TAG_START --><span class="token comment">/// &lt;reference path="../pb_data/types.d.ts" /></span>
+
+<span class="token function">onBootstrap</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">e</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    e<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"App initialized!"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><!-- HTML_TAG_END --></code> </div> <p data-svelte-h="svelte-3bmdhq">If after referencing the types your editor still doesn&#39;t perform linting, then you can try to rename your
+    file to have <code>.pb.ts</code> extension.</p> <h3 id="caveats-and-limitations" class="heading-link "><a href="#caveats-and-limitations" class="link-primary"> Caveats and limitations </a></h3> <h5 id="handlers-scope" class="heading-link "><a href="#handlers-scope" class="link-primary"> Handlers scope </a></h5> <p data-svelte-h="svelte-1c0r2xe">Each handler function (hook, route, middleware, etc.) is
+    <strong>serialized and executed in its own isolated context as a separate &quot;program&quot;</strong>. This means
+    that you don&#39;t have access to custom variables and functions declared outside of the handler scope. For
+    example, the below code will fail:</p> <div class="code-wrapper m-b-sm prism-light svelte-1qrji6i"><code class="svelte-1qrji6i"><!-- HTML_TAG_START --><span class="token keyword">const</span> name <span class="token operator">=</span> <span class="token string">"test"</span>
+
+<span class="token function">onBootstrap</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">e</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    e<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token comment">// &lt;-- name will be undefined inside the handler</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><!-- HTML_TAG_END --></code> </div> <p class="txt-hint txt-italic" data-svelte-h="svelte-1xt97wo">The above serialization and isolation context is also the reason why error stack trace line numbers may
+    not be accurate.</p> <p data-svelte-h="svelte-8y7ocf">One possible workaround for sharing/reusing code across different handlers could be to move and export the
+    reusable code portion as local module and load it with <code>require()</code> inside the handler but keep in
+    mind that the loaded modules use a shared registry and mutations should be avoided when possible to prevent
+    concurrency issues:</p>  <div class="code-wrapper m-b-sm prism-light svelte-1qrji6i"><code class="svelte-1qrji6i"><!-- HTML_TAG_START --><span class="token function">onBootstrap</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">e</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    e<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">const</span> config <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>__hooks<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/config.js</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>config<span class="token punctuation">.</span>name<span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><!-- HTML_TAG_END --></code> </div> <h5 id="relative-paths" class="heading-link "><a href="#relative-paths" class="link-primary"> Relative paths </a></h5> <p data-svelte-h="svelte-zoarm4">Relative file paths are relative to the current working directory (CWD) and not to the
+    <code>pb_hooks</code>.
+    <br>
+    To get an absolute path to the <code>pb_hooks</code> directory you can use the global
+    <code class="txt-bold">__hooks</code> variable.</p> <h5 id="loading-modules" class="heading-link "><a href="#loading-modules" class="link-primary"> Loading modules </a></h5> <div class="alert alert-danger m-b-sm" data-svelte-h="svelte-lbogdw"><div class="icon"><i class="ri-alert-line"></i></div> <div class="content"><p>Please note that the embedded JavaScript engine is not a Node.js or browser environment, meaning
+            that modules that rely on APIs like <em>window</em>, <em>fs</em>,
+            <em>fetch</em>, <em>buffer</em> or any other runtime specific API not part of the ES5 spec may not
+            work!</p></div></div> <p data-svelte-h="svelte-1vzlekg">You can load modules either by specifying their local filesystem path or by using their name, which will
+    automatically search in:</p> <ul data-svelte-h="svelte-y90y6e"><li>the current working directory (<em>affects also relative paths</em>)</li> <li>any <code>node_modules</code> directory</li> <li>any parent <code>node_modules</code> directory</li></ul> <p data-svelte-h="svelte-a6oo1o">Currently only CommonJS (CJS) modules are supported and can be loaded with
+    <code>const x = require(...)</code>.
+    <br>
+    ECMAScript modules (ESM) can be loaded by first precompiling and transforming your dependencies with a bundler
+    like
+    <a href="https://rollupjs.org/" target="_blank" rel="noopener noreferrer">rollup</a>,
+    <a href="https://webpack.js.org/" target="_blank" rel="noopener noreferrer">webpack</a>,
+    <a href="https://browserify.org/" target="_blank" rel="noopener noreferrer">browserify</a>, etc.</p> <p data-svelte-h="svelte-7twd0z">A common usage of local modules is for loading shared helpers or configuration parameters, for example:</p> <div class="code-wrapper m-b-sm prism-light svelte-1qrji6i"><code class="svelte-1qrji6i"><!-- HTML_TAG_START --><span class="token comment">// pb_hooks/utils.js</span>
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token function-variable function">hello</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token parameter">name</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"Hello "</span> <span class="token operator">+</span> name<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><!-- HTML_TAG_END --></code> </div> <div class="clearfix m-b-10"></div>  <div class="code-wrapper m-b-sm prism-light svelte-1qrji6i"><code class="svelte-1qrji6i"><!-- HTML_TAG_START --><span class="token comment">// pb_hooks/main.pb.js</span>
+<span class="token function">onBootstrap</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">e</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    e<span class="token punctuation">.</span><span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">const</span> utils <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>__hooks<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/utils.js</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span>
+    utils<span class="token punctuation">.</span><span class="token function">hello</span><span class="token punctuation">(</span><span class="token string">"world"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><!-- HTML_TAG_END --></code> </div> <div class="alert alert-info m-t-10 m-b-sm" data-svelte-h="svelte-km35bg"><div class="icon"><i class="ri-information-line"></i></div> <div class="content"><p>Loaded modules use a shared registry and mutations should be avoided when possible to prevent
+            concurrency issues.</p></div></div> <h5 id="performance" class="heading-link "><a href="#performance" class="link-primary"> Performance </a></h5> <p data-svelte-h="svelte-vll3a1">The prebuilt executable comes with a <strong>prewarmed pool of 15 JS runtimes</strong>, which helps
+    maintaining the handlers execution times on par with the Go equivalent code (see
+    <a href="https://github.com/pocketbase/benchmarks/blob/master/results/hetzner_cax11.md#go-vs-js-route-execution" target="blank" rel="noopener noreferrer">benchmarks</a>). You can adjust the pool size manually with the <code>--hooksPool=50</code> flag (<em>increasing the pool size may improve the performance in high concurrent scenarios but also will
+        increase the memory usage</em>).</p> <p data-svelte-h="svelte-useozh">Note that the handlers performance may degrade if you have heavy computational tasks in pure JavaScript
+    (encryption, random generators, etc.). For such cases prefer using the exposed <a href="/jsvm/index.html" target="_blank">Go bindings</a>
+    (e.g. <code>$security.randomString(10)</code>).</p> <h5 id="engine-limitations" class="heading-link "><a href="#engine-limitations" class="link-primary"> Engine limitations </a></h5> <p data-svelte-h="svelte-4ws1ie">We inherit some of the limitations and caveats of the embedded JavaScript engine
+    
+    (<a href="https://github.com/dop251/goja" target="_blank" rel="nopppener noreferrer">goja</a>):</p> <ul data-svelte-h="svelte-a0p37w"><li>Has most of ES6 functionality already implemented but it is not fully spec compliant yet.</li> <li>No concurrent execution inside a single handler (aka. no <code>setTimeout</code>/<code>setInterval</code>).</li> <li>Wrapped Go structural types (such as maps, slices) comes with some peculiarities and do not behave the
+        exact same way as native ECMAScript values (for more details see
+        <a href="https://pkg.go.dev/github.com/dop251/goja#Runtime.ToValue" target="blank" rel="noreferrer noopener">goja ToValue</a>).</li> <li>In relation to the above, DB <code>json</code> field values require the use of <code>get()</code> and
+        <code>set()</code> helpers (<em>this may change in the future</em>).</li></ul></div> <hr> <div class="docs-footer svelte-1dbn67j" data-pagefind-ignore> <a href="/docs/js-event-hooks" class="btn btn-outline btn-expanded btn-next svelte-1dbn67j"><span class="txt">Next: Event hooks</span> <i class="ri-arrow-right-line"></i></a> </div></div></main> <footer class="page-footer"><div class="wrapper wrapper-lg"><div class="primary-bar"><nav class="footer-col links" data-svelte-h="svelte-3s56aa"><a href="/faq" class="link-item">FAQ</a> <a href="https://github.com/pocketbase/pocketbase/discussions" class="link-item" target="_blank" rel="noopener noreferrer">Discussions</a> <a href="/docs" class="link-item">Documentation</a></nav> <nav class="footer-col links" data-svelte-h="svelte-1ie6rey"><a href="https://github.com/pocketbase/js-sdk" class="link-item" target="_blank" rel="noopener noreferrer">JavaScript SDK</a> <a href="https://github.com/pocketbase/dart-sdk" class="link-item" target="_blank" rel="noopener noreferrer">Dart SDK</a></nav> <div class="footer-col socials"><div class="watermark-logo" data-svelte-h="svelte-tfgzzj">Pocket<strong>Base</strong></div> <a href="mailto:support" class="btn btn-secondary btn-circle btn-hint social-item" aria-label="Contact support"><i class="ri-mail-line"></i></a> <a href="https://github.com/pocketbase/pocketbase" rel="noopener noreferrer" target="_blank" class="btn btn-secondary btn-circle btn-hint social-item" aria-label="Go to GitHub" data-svelte-h="svelte-liy1aj"><i class="ri-github-line"></i></a></div></div> <div class="secondary-bar"><div class="terms"><span class="txt">© 2023-2026 Pocket<strong data-svelte-h="svelte-1d8skxd">Base</strong></span> <span class="gopher-credit" data-svelte-h="svelte-3v1v6q">The Gopher artwork is from
+                    <a href="https://github.com/marcusolsson/gophers" target="_blank" rel="noreferrer noopener">marcusolsson/gophers</a></span></div> <div class="flex-fill"></div> <div class="credit" data-svelte-h="svelte-18tjksi">Crafted by <a href="https://gani.bg" target="_blank" rel="noopener noreferrer" class="link-hint"><strong>Gani</strong></a></div></div></div></footer>  <button type="button" class="btn btn-lg btn-circle btn-secondary scroll-to-top svelte-1fubo8o" arial-label="Go to top" data-svelte-h="svelte-tty6dx"><i class="ri-arrow-up-line"></i> </button> 
+			
+			<script>
+				{
+					__sveltekit_1vdg0l = {
+						base: new URL("../..", location).pathname.slice(0, -1)
+					};
+
+					const element = document.currentScript.parentElement;
+
+					const data = [null,null,null,null];
+
+					Promise.all([
+						import("../../_app/immutable/entry/start.D2fjbJ_a.js"),
+						import("../../_app/immutable/entry/app.CiOhnQKG.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2, 3, 48],
+							data,
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+</body>
+</html>
