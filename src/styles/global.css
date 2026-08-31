@@ -332,7 +332,7 @@ code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: 12p
   width: 28px;
   height: 28px;
   border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   color: #fff;
   font-weight: 800;
   font-size: 15px;
