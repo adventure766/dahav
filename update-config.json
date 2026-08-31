@@ -5,6 +5,8 @@
   "releaseOwner": "adventure766",
   "releaseRepo": "dahav",
   "releaseNotes": [
-    "Changed the DAHAV logo color to blue for update-system testing."
+    "Customer-specific selling prices: cashiers can override the unit price per cart line in POS for a single sale; the actual price charged is stored on the sale and used in totals, receipts, payments, and reports, and never modifies the product's default price.",
+    "FIFO consistency fix: creating a product with opening stock now creates a matching inventory layer so the displayed stock and FIFO availability never contradict each other; existing products with stock but missing layers are back-filled on upgrade.",
+    "Stock-in response now reflects the updated weighted average unit cost immediately."
   ]
 }
