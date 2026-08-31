@@ -1,11 +1,13 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "date": "2026-08-31",
   "notes": "DAHAV update.",
   "releaseNotes": [
-    "Changed the DAHAV logo color to blue for update-system testing."
+    "Customer-specific selling prices: cashiers can override the unit price per cart line in POS for a single sale; the actual price charged is stored on the sale and used in totals, receipts, payments, and reports, and never modifies the product's default price.",
+    "FIFO consistency fix: creating a product with opening stock now creates a matching inventory layer so the displayed stock and FIFO availability never contradict each other; existing products with stock but missing layers are back-filled on upgrade.",
+    "Stock-in response now reflects the updated weighted average unit cost immediately."
   ],
-  "url": "https://github.com/adventure766/dahav/releases/download/v1.0.1/DAHAV-1.0.1.zip",
-  "sha256": "fe3c56c2fb05d99919a9bc77bad2c3a241b8684eaa8f39e15a87b4c4aa3bd1bc",
+  "url": "https://github.com/adventure766/dahav/releases/download/v1.0.2/DAHAV-1.0.2.zip",
+  "sha256": "920f4433888a9fce5e153baad91468939f5d7197284246759af186bdd2b49762",
   "min_version": "1.0.0"
 }
