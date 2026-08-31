@@ -612,6 +612,9 @@ function executeStockIn(app, input) {
 
   // Refresh weighted unit cost from remaining layers
   refreshProductUnitCost(app, product);
+  // Re-read the product so the returned record reflects the refreshed
+  // weighted unit cost (refreshProductUnitCost saves a fresh instance).
+  const refreshed = app.findRecordById("products", product.id);
 
   try {
     services.audit(app, { collection: "inventory_movements", record_id: mov.id, action: "create", reason: "stock in", after: { product: product.get("name"), quantity: qty, unit_cost: unitCost }, by: input.by });
@@ -619,7 +622,7 @@ function executeStockIn(app, input) {
     // audit must never break the stock operation
   }
 
-  return { movement: mov, layer, product };
+  return { movement: mov, layer, product: refreshed };
 }
 
 /**

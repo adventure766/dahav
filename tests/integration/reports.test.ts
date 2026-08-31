@@ -163,9 +163,14 @@ describe("reports", () => {
     expect(dash.data.gross_profit).toBe(pnlR.data.gross_profit);
     expect(dash.data.net_profit).toBe(pnlR.data.net_profit);
 
-    // Dashboard outstanding == customer debt report total outstanding
+    // Dashboard outstanding == sales report total outstanding (both cover ALL
+    // sales, including walk-ins). The customer debt report is a different,
+    // narrower metric (customer-attributed sales only), so it is checked
+    // separately below.
+    expect(dash.data.outstanding).toBe(salesR.data.totals.total_outstanding);
     const debtR = await get("/api/dahav/reports/customer_debt", mgrToken);
-    expect(dash.data.outstanding).toBe(debtR.data.totals.total_outstanding);
+    expect(typeof debtR.data.totals.total_outstanding).toBe("number");
+    expect(dash.data.outstanding).toBeGreaterThanOrEqual(debtR.data.totals.total_outstanding);
 
     // Dashboard damage loss == damage report total cost
     const dmgR = await get("/api/dahav/reports/damage", mgrToken);
