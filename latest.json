@@ -1,14 +1,12 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "date": "2026-09-01",
   "notes": "DAHAV update.",
   "releaseNotes": [
-    "Fixed the version indicator: the version shown in the bottom of the sidebar now correctly reflects the installed release (v1.0.3). The release packager always rebuilds the frontend so the displayed version can never go stale again.",
-    "Customer-specific selling prices: cashiers can override the unit price per cart line in POS for a single sale; the actual price charged is stored on the sale and used in totals, receipts, payments, and reports, and never modifies the product's default price.",
-    "FIFO consistency fix: creating a product with opening stock now creates a matching inventory layer so the displayed stock and FIFO availability never contradict each other; existing products with stock but missing layers are back-filled on upgrade.",
-    "Stock-in response now reflects the updated weighted average unit cost immediately."
+    "Fixed the custom unit price field in POS: typing a price (e.g. 6.67) no longer makes the input lose focus or reset. The field now keeps focus and every keystroke, so decimal prices can be typed normally and quickly, with the line total updating live.",
+    "Fixed the version indicator: the version shown at the bottom of the sidebar now correctly reflects the installed release."
   ],
-  "url": "https://github.com/adventure766/dahav/releases/download/v1.0.3/DAHAV-1.0.3.zip",
-  "sha256": "f636731a5932b1320567bc72647681337a37203b95a8bed13736a41c065d471b",
+  "url": "https://github.com/adventure766/dahav/releases/download/v1.0.4/DAHAV-1.0.4.zip",
+  "sha256": "f5822c02d01c79ebb098c4e6ce91873563c6bc16d56b04583c767adb992f0f83",
   "min_version": "1.0.0"
 }
