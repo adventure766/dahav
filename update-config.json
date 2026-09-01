@@ -5,9 +5,7 @@
   "releaseOwner": "adventure766",
   "releaseRepo": "dahav",
   "releaseNotes": [
-    "Fixed the version indicator: the version shown in the bottom of the sidebar now correctly reflects the installed release (v1.0.3). The release packager always rebuilds the frontend so the displayed version can never go stale again.",
-    "Customer-specific selling prices: cashiers can override the unit price per cart line in POS for a single sale; the actual price charged is stored on the sale and used in totals, receipts, payments, and reports, and never modifies the product's default price.",
-    "FIFO consistency fix: creating a product with opening stock now creates a matching inventory layer so the displayed stock and FIFO availability never contradict each other; existing products with stock but missing layers are back-filled on upgrade.",
-    "Stock-in response now reflects the updated weighted average unit cost immediately."
+    "Fixed the custom unit price field in POS: typing a price (e.g. 6.67) no longer makes the input lose focus or reset. The field now keeps focus and every keystroke, so decimal prices can be typed normally and quickly, with the line total updating live.",
+    "Fixed the version indicator: the version shown at the bottom of the sidebar now correctly reflects the installed release."
   ]
 }
