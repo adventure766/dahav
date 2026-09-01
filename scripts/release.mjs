@@ -138,10 +138,11 @@ function crc32(buf) {
 // --- main ----------------------------------------------------------------------
 console.log(`\nDAHAV release v${version}\n`);
 
-if (!existsSync(distDir)) {
-  console.log("dist/ missing — running build first…");
-  execSync("npm run build", { stdio: "inherit", cwd: root });
-}
+// Always rebuild: the frontend bakes __APP_VERSION__ (from package.json) into
+// the bundle at build time. Reusing a pre-existing dist/ can ship a bundle
+// whose version indicator is stale (e.g. dist built before a version bump).
+console.log("Running production build (bakes version into the bundle)…");
+execSync("npm run build", { stdio: "inherit", cwd: root });
 
 console.log("Deploying dist -> pb_public …");
 rmSync(publicDir, { recursive: true, force: true });
