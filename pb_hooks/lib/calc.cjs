@@ -451,21 +451,36 @@ function createReceipt(app, { sale, payment, payment_currency, rate, amount_due,
   // ------------------------------------------------------------------
   let totalPaidCcy = 0;
   let totalPaidUsdFromPays = 0;
+  const paymentDetails = [];
   try {
     if (sale) {
-      const pays = app.findRecordsByFilter("payments", `sale = '${sale.id}'`, undefined, 0, 0);
+      const pays = app.findRecordsByFilter("payments", `sale = '${sale.id}'`, "created", 0, 0);
       for (const p of pays) {
         if (p.get("status") === "void" || p.get("status") === "refunded") continue;
         const pAmount = Number(p.get("amount")) || 0;
         const pCcy = String(p.get("currency") || "USD").toUpperCase();
         const pRate = Number(p.get("exchange_rate")) || rate;
+        const pUsd = Number(p.get("amount_usd")) || 0;
+        // Per-payment breakdown: the exact currency, amount, rate and USD
+        // equivalent that were recorded at the time of payment. This is what
+        // lets a receipt (and any later reprint) show HOW the balance was
+        // reached without re-deriving anything from today's rate.
+        paymentDetails.push({
+          payment_id: p.get("payment_id"),
+          amount: engine.roundMoney(pAmount),
+          currency: pCcy,
+          exchange_rate: pRate,
+          amount_usd: engine.roundMoney(pUsd),
+          payment_method: p.get("payment_method") || "",
+          date: p.get("created"),
+        });
         if (pCcy === payment_currency) {
           totalPaidCcy = engine.roundMoney(totalPaidCcy + pAmount);
         } else {
           // Convert this payment into the receipt's currency via its USD value.
-          totalPaidCcy = engine.roundMoney(totalPaidCcy + engine.fromUsd(Number(p.get("amount_usd")) || 0, payment_currency, pRate));
+          totalPaidCcy = engine.roundMoney(totalPaidCcy + engine.fromUsd(pUsd, payment_currency, pRate));
         }
-        totalPaidUsdFromPays = engine.roundMoney(totalPaidUsdFromPays + (Number(p.get("amount_usd")) || 0));
+        totalPaidUsdFromPays = engine.roundMoney(totalPaidUsdFromPays + pUsd);
       }
     }
   } catch (payErr) { /* payment list failure is non-fatal */ }
@@ -510,6 +525,8 @@ function createReceipt(app, { sale, payment, payment_currency, rate, amount_due,
     // Exact payment-currency views for receipts (see derivation above).
     total_paid_ccy: totalPaidCcy,
     outstanding_ccy: outstandingCcy,
+    // Per-payment breakdown (actual recorded currency/rate/amounts).
+    payments: paymentDetails,
   };
 
   const col = app.findCollectionByNameOrId("receipts");
@@ -772,6 +789,49 @@ function executePaymentOnSale(app, input) {
       app.save(inv);
     }
   } catch (invErr) { /* invoice missing is non-fatal */ }
+
+  // Keep the RECEIPT in sync: it is the document a customer sees, so it must
+  // reflect EVERY payment on the sale (in its own currency and at its own
+  // recorded exchange rate), not just the first checkout payment. Regenerate
+  // the snapshot from the current authoritative state.
+  try {
+    const saleItems = app.findRecordsByFilter("sale_items", `sale = '${sale.id}'`, "", 100000, 0);
+    const items = [];
+    for (const si of saleItems) {
+      const prod = app.findRecordById("products", si.get("product"));
+      if (!prod) continue;
+      items.push({
+        product: prod,
+        quantity: Number(si.get("quantity")) || 0,
+        unit_price: Number(si.get("unit_price")) || 0,
+        unit_cost: Number(si.get("unit_cost")) || 0,
+      });
+    }
+    const sub = saleItems.reduce((s, si) => s + (Number(si.get("line_total")) || 0), 0);
+    const receiptInput = {
+      sale,
+      payment,
+      payment_currency: input.currency,
+      rate,
+      amount_due: input.amount,
+      amount_usd: amountUsd,
+      tendered: input.tendered || 0,
+      change: payment.get("change") || 0,
+      items,
+      totals: { subtotal: sub, discount: 0, total: Number(sale.get("total")) || sub },
+      cashier_id: input.by || "",
+      customer_id: sale.get("customer") || "",
+      date,
+    };
+    // Replace the previous receipt snapshot (there is one receipt per sale).
+    const oldRecs = app.findRecordsByFilter("receipts", `sale = '${sale.id}'`, "", 100000, 0);
+    for (const r of oldRecs) {
+      try { app.delete(r); } catch (e) { /* ignore */ }
+    }
+    createReceipt(app, receiptInput);
+  } catch (recErr) {
+    // Receipt regeneration must never break the payment itself.
+  }
 
   try {
     services.audit(app, { collection: "payments", record_id: payment.id, action: "create", reason: "payment on sale", after: { payment_id: paymentId, amount, currency: input.currency, amount_usd: amountUsd }, by: input.by });

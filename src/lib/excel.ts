@@ -221,6 +221,7 @@ export function salesExcel(ctx: DocContext, data: { rows: SalesReportRow[]; tota
     { header: "Currency", key: "currency", width: 10 },
     { header: "Exchange Rate", key: "rate", width: 12, numFmt: NUM, align: "right" },
     { header: "Reporting", key: "reporting", width: 14, numFmt: USD_FMT, align: "right" },
+    { header: "Payment Details", key: "payments", width: 50 },
     { header: "Status", key: "status", width: 12 },
   ] : [
     { header: "Date", key: "date", width: 13 },
@@ -230,6 +231,7 @@ export function salesExcel(ctx: DocContext, data: { rows: SalesReportRow[]; tota
     { header: "Total", key: "total", width: 12, numFmt: USD_FMT, align: "right" },
     { header: "Paid", key: "paid", width: 12, numFmt: USD_FMT, align: "right" },
     { header: "Outstanding", key: "outstanding", width: 12, numFmt: USD_FMT, align: "right" },
+    { header: "Payment Details", key: "payments", width: 50 },
     { header: "Status", key: "status", width: 12 },
   ];
   return buildReportWorkbook({
@@ -246,14 +248,20 @@ export function salesExcel(ctx: DocContext, data: { rows: SalesReportRow[]; tota
       { label: "Transactions", value: String((data?.totals?.count) ?? 0) },
     ],
     rows: useAll
-      ? rows.map((r) => [
-          parseDate(r.date), r.transaction_id, r.customer || "Walk-in", r.cashier || "—",
-          r.total, r.currency, r.exchange_rate || null, r.total, r.status.toUpperCase(),
-        ])
-      : rows.map((r) => [
-          parseDate(r.date), r.transaction_id, r.customer || "Walk-in", r.cashier || "—",
-          r.total, r.amount_paid, r.amount_outstanding, r.status.toUpperCase(),
-        ]),
+      ? rows.map((r) => {
+          const pay = (r.payments || []).map((p) => `${p.amount} ${p.currency} @ ${p.exchange_rate} (${p.amount_usd} USD)`).join("; ");
+          return [
+            parseDate(r.date), r.transaction_id, r.customer || "Walk-in", r.cashier || "—",
+            r.total, r.currency, r.exchange_rate || null, r.total, pay || r.payment_currency || "—", r.status.toUpperCase(),
+          ];
+        })
+      : rows.map((r) => {
+          const pay = (r.payments || []).map((p) => `${p.amount} ${p.currency} @ ${p.exchange_rate} (${p.amount_usd} USD)`).join("; ");
+          return [
+            parseDate(r.date), r.transaction_id, r.customer || "Walk-in", r.cashier || "—",
+            r.total, r.amount_paid, r.amount_outstanding, pay || r.payment_currency || "—", r.status.toUpperCase(),
+          ];
+        }),
     totals: [
       { label: "Total Sales", value: (data?.totals?.total_sales) ?? 0, bold: true },
       { label: "Total Paid", value: (data?.totals?.total_paid) ?? 0 },

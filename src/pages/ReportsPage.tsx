@@ -326,6 +326,23 @@ function renderCell(col: { key: string; label: string; right?: boolean; currency
     return <span className={isSsp(cur) ? "money-ssp" : "money-usd"}>{money(Number(v), cur)}</span>;
   }
   if (col.key === "exchange_rate") return <span className="muted">{rateLabel(Number(v))}</span>;
+  if (col.key === "payment_currency") {
+    const pays = (row.payments as Array<{ amount: number; currency: string; exchange_rate: number; amount_usd: number }> | undefined) || [];
+    if (pays.length === 0) return <span className="muted">—</span>;
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        {pays.map((p, i) => {
+          const c = (p.currency || "USD").toUpperCase();
+          return (
+            <span key={i} className="muted small" style={{ whiteSpace: "nowrap" }}>
+              <span className={`badge ${isSsp(c) ? "ssp" : "usd"}`}>{c}</span>{" "}
+              {c === "SSP" ? ssp(p.amount) : usd(p.amount)} @ {rateLabel(p.exchange_rate)} (={usd(p.amount_usd)})
+            </span>
+          );
+        })}
+      </div>
+    );
+  }
   if (col.key === "currency") return <span className={`badge ${isSsp(String(v)) ? "ssp" : "usd"}`}>{String(v)}</span>;
   if (col.key === "status") {
     const map: Record<string, string> = { completed: "green", paid: "green", partial: "yellow", credit: "yellow", void: "red" };

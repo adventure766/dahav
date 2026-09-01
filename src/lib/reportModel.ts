@@ -80,6 +80,7 @@ export function financialColumns(view: CurrencyView): RepCol[] {
       { key: "currency", label: "Currency" },
       { key: "exchange_rate", label: "Exchange Rate", right: true },
       { key: "amount_usd", label: "USD Equivalent", right: true },
+      { key: "payment_currency", label: "Payment Currency" },
       { key: "status", label: "Status" },
     ];
   }
@@ -94,6 +95,7 @@ export function financialColumns(view: CurrencyView): RepCol[] {
     { key: "amount", label: `Amount${suffix}`, right: true, currencyKey: "currency" },
     { key: "paid", label: `Paid${suffix}`, right: true, currencyKey: "currency" },
     { key: "outstanding", label: `Outstanding${suffix}`, right: true, currencyKey: "currency" },
+    { key: "payment_currency", label: "Payment Currency" },
     { key: "status", label: "Status" },
   ];
 }

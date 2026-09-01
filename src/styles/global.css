@@ -808,8 +808,10 @@ td.money { font-variant-numeric: tabular-nums; text-align: right; white-space: n
 .receipt .center { text-align: center; }
 .receipt .divider { border-top: 1px dashed #333; margin: 8px 0; }
 .receipt .row { display: flex; justify-content: space-between; }
+.receipt .row.small { font-size: 11px; }
 .receipt .total-row { display: flex; justify-content: space-between; font-weight: 700; }
 .receipt .line-item { margin-bottom: 6px; }
+.receipt .payment-block { margin: 4px 0 6px; padding-left: 4px; border-left: 2px solid #ddd; }
 .receipt .capitalize { text-transform: capitalize; }
 .capitalize { text-transform: capitalize; }
 

@@ -334,6 +334,13 @@ export function receiptApprovalBlock(): ContentItem[] {
 export interface SalesReportRow {
   date: string; sale_id: string; transaction_id: string; customer: string; cashier: string;
   subtotal: number; discount: number; total: number; amount_paid: number; amount_outstanding: number; status: string;
+  /** Payment currency summary ("SSP", "USD", "SSP+USD" for multiple). */
+  payment_currency?: string;
+  /** Per-payment details with the exact recorded currency/rate/amounts. */
+  payments?: Array<{
+    payment_id: string; amount: number; currency: string; exchange_rate: number;
+    amount_usd: number; payment_method?: string; date?: string;
+  }>;
 }
 
 export function salesPdf(ctx: DocContext, data: { rows: SalesReportRow[]; totals: Record<string, number> }): DocDef {
@@ -356,33 +363,41 @@ export function salesPdf(ctx: DocContext, data: { rows: SalesReportRow[]; totals
     ]),
     ruleTable({
       headers: useAll
-        ? ["Date", "Transaction ID", "Customer", "Cashier", "Original Amount", "Currency", "Rate", "Reporting", "Status"]
-        : ["Date", "Transaction ID", "Customer", "Cashier", "Total", "Paid", "Outstanding", "Status"],
-      rows: rows.map((r) => useAll
-        ? [
-            new Date(r.date).toLocaleDateString("en-GB"),
-            r.transaction_id,
-            r.customer || "Walk-in",
-            r.cashier || "—",
-            money(r.total, r.currency),
-            r.currency,
-            r.exchange_rate ? String(r.exchange_rate) : "—",
-            usd(r.total),
-            r.status.toUpperCase(),
-          ]
-        : [
-            new Date(r.date).toLocaleDateString("en-GB"),
-            r.transaction_id,
-            r.customer || "Walk-in",
-            r.cashier || "—",
-            money(r.total, r.currency),
-            money(r.amount_paid, r.currency),
-            money(r.amount_outstanding, r.currency),
-            r.status.toUpperCase(),
-          ]),
+        ? ["Date", "Transaction ID", "Customer", "Cashier", "Original Amount", "Currency", "Rate", "Reporting", "Payment Currency", "Status"]
+        : ["Date", "Transaction ID", "Customer", "Cashier", "Total", "Paid", "Outstanding", "Payment Currency", "Status"],
+      rows: rows.map((r) => {
+        // Compact per-payment summary: e.g. "300,000 SSP @ 8000 ($37.50)".
+        const paySummary = (r.payments || []).map((p) =>
+          `${p.currency === "SSP" ? ssp(p.amount) : usd(p.amount)} ${p.currency} @ ${p.exchange_rate} (${usd(p.amount_usd)})`
+        ).join("  |  ");
+        return useAll
+          ? [
+              new Date(r.date).toLocaleDateString("en-GB"),
+              r.transaction_id,
+              r.customer || "Walk-in",
+              r.cashier || "—",
+              money(r.total, r.currency),
+              r.currency,
+              r.exchange_rate ? String(r.exchange_rate) : "—",
+              usd(r.total),
+              paySummary || r.payment_currency || "—",
+              r.status.toUpperCase(),
+            ]
+          : [
+              new Date(r.date).toLocaleDateString("en-GB"),
+              r.transaction_id,
+              r.customer || "Walk-in",
+              r.cashier || "—",
+              money(r.total, r.currency),
+              money(r.amount_paid, r.currency),
+              money(r.amount_outstanding, r.currency),
+              paySummary || r.payment_currency || "—",
+              r.status.toUpperCase(),
+            ];
+      }),
       alignRight: useAll ? [4, 6, 7] : [4, 5, 6],
-      weights: useAll ? [8, 15, 12, 10, 12, 8, 8, 11, 10] : [8, 18, 14, 11, 10, 10, 11, 11],
-      wrap: [1, 2, 3],
+      weights: useAll ? [7, 13, 10, 9, 10, 7, 7, 9, 18, 8] : [8, 15, 12, 10, 9, 9, 10, 18, 9],
+      wrap: [1, 2, 3, 8],
       contentWidth: PAGE.landscape.contentW,
       fontSize: 8,
       headerFontSize: 7.5,
@@ -692,7 +707,7 @@ export interface ReceiptPdfData {
   payment_method?: string; transaction_status?: string;
   outstanding?: number; total_paid?: number;
   outstanding_ccy?: number; total_paid_ccy?: number;
-  payments?: Array<{ payment_id: string; amount: number; currency: string; amount_usd: number; date: string }>;
+  payments?: Array<{ payment_id: string; amount: number; currency: string; exchange_rate?: number; amount_usd: number; date: string }>;
 }
 
 export function receiptPdf(data: ReceiptPdfData): DocDef {
@@ -788,16 +803,17 @@ export function receiptPdf(data: ReceiptPdfData): DocDef {
     doc.content.push(
       { text: "PAYMENT HISTORY", style: "reportTitle", margin: [0, 0, 0, 6] },
       ruleTable({
-        headers: ["Payment ID", "Date", "Amount", "Currency", "USD Equivalent"],
+        headers: ["Payment ID", "Date", "Amount", "Currency", "Exchange Rate", "USD Equivalent"],
         rows: data.payments.map((p) => [
           p.payment_id,
           new Date(p.date).toLocaleDateString("en-GB"),
           p.currency === "SSP" ? ssp(p.amount) : usd(p.amount),
           p.currency,
+          p.exchange_rate ? String(p.exchange_rate) : "—",
           usd(p.amount_usd),
         ]),
-        alignRight: [2, 4],
-        weights: [7, 4, 4, 3, 4],
+        alignRight: [2, 4, 5],
+        weights: [6, 4, 4, 3, 3, 4],
         wrap: [0],
         keepRows: true,
       }),

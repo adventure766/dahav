@@ -62,6 +62,26 @@ function salesReport(app, input) {
     if (s.get("cashier")) {
       try { const u = app.findRecordById("users", s.get("cashier")); cashierName = u ? u.get("name") : ""; } catch (e) { cashierName = ""; }
     }
+    // Per-payment details: each payment's ACTUAL recorded currency, amount,
+    // exchange rate and USD equivalent. Never combined or re-converted — the
+    // report shows exactly what was persisted at payment time so multi-payment
+    // and multi-currency sales stay transparent.
+    const payments = [];
+    try {
+      const pays = app.findRecordsByFilter("payments", `sale = '${s.id}'`, "created", 0, 0);
+      for (const p of pays) {
+        if (p.get("status") === "void" || p.get("status") === "refunded") continue;
+        payments.push({
+          payment_id: p.get("payment_id"),
+          amount: Number(p.get("amount")) || 0,
+          currency: String(p.get("currency") || "USD").toUpperCase(),
+          exchange_rate: Number(p.get("exchange_rate")) || 0,
+          amount_usd: Number(p.get("amount_usd")) || 0,
+          payment_method: p.get("payment_method") || "",
+          date: p.get("created"),
+        });
+      }
+    } catch (e) { /* payment list failure is non-fatal */ }
     return {
       sale_id: s.get("sale_id"),
       transaction_id: txn ? txn.get("transaction_id") : "",
@@ -81,6 +101,9 @@ function salesReport(app, input) {
       status: s.get("status"),
       original_currency: s.get("original_currency"),
       exchange_rate: money(s, "exchange_rate"),
+      // Payment currency/rate details for this sale (see payments above).
+      payment_currency: payments.length ? payments.map((p) => p.currency).join("+") : (s.get("original_currency") || "USD"),
+      payments,
     };
   });
 

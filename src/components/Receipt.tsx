@@ -39,6 +39,17 @@ export interface ReceiptData {
   outstanding_ccy?: number;
   /** Cumulative paid in the PAYMENT currency. */
   total_paid_ccy?: number;
+  /** Per-payment breakdown: exact recorded currency, amount, rate and USD
+   *  equivalent for every payment on the sale. Never re-derived. */
+  payments?: Array<{
+    payment_id?: string;
+    amount: number;
+    currency: string;
+    exchange_rate: number;
+    amount_usd: number;
+    payment_method?: string;
+    date?: string;
+  }>;
 }
 
 /** Professional, printable receipt. Works with browser print + thermal (80mm). */
@@ -118,6 +129,39 @@ export function Receipt({ data }: { data: ReceiptData }) {
         </div>
       )}
       <div className="row"><span>USD Equivalent</span><span className="money-usd">{usd(data.amount_usd ?? data.total ?? 0)}</span></div>
+      {(data.payments || []).length > 0 && (
+        <>
+          <div className="divider" />
+          <div className="row"><span><strong>Payments</strong></span></div>
+          {data.payments!.map((p, idx) => {
+            const pCur = (p.currency || "USD").toUpperCase();
+            return (
+              <div key={idx} className="payment-block">
+                <div className="row">
+                  <span>{p.payment_id ? `Payment ${p.payment_id}` : `Payment ${idx + 1}`}</span>
+                  <span className={pCur === "SSP" ? "money-ssp" : "money-usd"}>
+                    {pCur === "SSP" ? ssp(p.amount) : usd(p.amount)} {pCur}
+                  </span>
+                </div>
+                <div className="row small">
+                  <span>Exchange Rate</span>
+                  <span>{rateLabel(p.exchange_rate)}</span>
+                </div>
+                <div className="row small">
+                  <span>USD Equivalent</span>
+                  <span className="money-usd">{usd(p.amount_usd)}</span>
+                </div>
+                {p.date && (
+                  <div className="row small">
+                    <span>Date</span>
+                    <span>{new Date(p.date).toLocaleDateString()}</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </>
+      )}
       {data.tendered !== undefined && data.tendered > 0 && (
         <div className="row">
           <span>Tendered</span>
