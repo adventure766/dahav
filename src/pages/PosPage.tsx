@@ -27,6 +27,10 @@ interface CartLine {
    *  this price for this transaction only; the product's default price is
    *  never modified. */
   unit_price?: number;
+  /** Raw text being typed in the unit-price input for this line. Kept as a
+   *  string so intermediate values ("6.", "6.6") survive keystroke-by-keystroke
+   *  without the input losing focus or being remounted. Mirrors unit_price. */
+  priceText?: string;
 }
 
 interface CheckoutResult {
@@ -118,15 +122,26 @@ export function PosPage() {
     });
   };
 
-  /** Set a per-sale unit price override for a cart line. Empty/invalid values
-   *  revert to the product's default price. The product master price is never
-   *  touched — the override lives only on this cart line for this transaction. */
-  const setUnitPrice = (id: string, value: string) => {
+  /** Per-sale unit price override editing.
+   *
+   *  The input is a fully controlled TEXT field: the raw string typed by the
+   *  cashier lives in `priceText` and is preserved on every keystroke, so
+   *  intermediate values ("6", "6.", "6.6", "6.67") type naturally without the
+   *  field losing focus, being remounted, or having characters replaced.
+   *  The value is only parsed to a number when it forms a valid positive
+   *  price; anything incomplete is kept as text but treated as "no override"
+   *  until it is valid. The product's master price is never touched. */
+  const setUnitPriceText = (id: string, raw: string) => {
     setCart((prev) => prev.map((l) => {
       if (l.product.id !== id) return l;
-      const n = Number(value);
-      if (value === "" || !(n > 0)) return { ...l, unit_price: undefined };
-      return { ...l, unit_price: n };
+      const text = raw.replace(",", ".");
+      // Only accept digits and a single decimal point so the typed value
+      // stays a parseable price. Rejecting invalid keystrokes (instead of
+      // clearing the field) is what lets "6." and "6.6" survive.
+      if (!/^\d*\.?\d*$/.test(text)) return l;
+      const n = Number(text);
+      const valid = text !== "" && Number.isFinite(n) && n > 0;
+      return { ...l, priceText: text, unit_price: valid ? n : undefined };
     }));
   };
 
@@ -213,19 +228,24 @@ export function PosPage() {
                   <span className="muted small">Unit price</span>
                   <input
                     className={l.unit_price !== undefined ? "custom-price-input" : ""}
-                    type="number"
-                    min="0"
-                    step="any"
+                    type="text"
+                    inputMode="decimal"
                     placeholder={String(l.product.unit_price)}
-                    defaultValue=""
-                    key={l.product.id + "-" + (l.unit_price ?? "")}
-                    onChange={(e) => setUnitPrice(l.product.id, e.target.value)}
+                    value={l.priceText ?? ""}
+                    onChange={(e) => setUnitPriceText(l.product.id, e.target.value)}
+                    onBlur={() => {
+                      // Normalize a trailing decimal point ("6." -> "6") once
+                      // the field loses focus; keeps the typed value intact.
+                      if (l.priceText && l.priceText.endsWith(".") && l.unit_price === undefined) {
+                        setCart((prev) => prev.map((x) => x.product.id === l.product.id ? { ...x, priceText: x.priceText!.slice(0, -1), unit_price: Number(x.priceText!.slice(0, -1)) } : x));
+                      }
+                    }}
                     aria-label={`Unit price for ${l.product.name}`}
                   />
                   {l.unit_price !== undefined && (
                     <button
                       className="btn small ghost"
-                      onClick={() => setUnitPrice(l.product.id, "")}
+                      onClick={() => setUnitPriceText(l.product.id, "")}
                       aria-label="Reset price to default"
                     >
                       <X size={13} />
