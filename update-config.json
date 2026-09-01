@@ -5,7 +5,8 @@
   "releaseOwner": "adventure766",
   "releaseRepo": "dahav",
   "releaseNotes": [
-    "Fixed the custom unit price field in POS: typing a price (e.g. 6.67) no longer makes the input lose focus or reset. The field now keeps focus and every keystroke, so decimal prices can be typed normally and quickly, with the line total updating live.",
-    "Fixed the version indicator: the version shown at the bottom of the sidebar now correctly reflects the installed release."
+    "Receipts now show the full payment breakdown: every payment with its currency, amount, the actual exchange rate recorded at the time of payment, the USD equivalent, and the payment date. Receipts also update when further payments are made against a sale, so partial and multi-currency payments are always displayed correctly.",
+    "The sales report now shows payment currency and exchange-rate details per sale, including a clear per-payment breakdown when a sale was paid in multiple currencies (e.g. USD + SSP). Outstanding balances remain mathematically consistent and are never treated as paid.",
+    "Fixed the custom unit price field in POS: typing a price (e.g. 6.67) no longer makes the input lose focus or reset; the field keeps focus and every keystroke, with the line total updating live."
   ]
 }
