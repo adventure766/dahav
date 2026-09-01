@@ -1,12 +1,13 @@
 {
-  "version": "1.0.4",
+  "version": "1.0.5",
   "date": "2026-09-01",
   "notes": "DAHAV update.",
   "releaseNotes": [
-    "Fixed the custom unit price field in POS: typing a price (e.g. 6.67) no longer makes the input lose focus or reset. The field now keeps focus and every keystroke, so decimal prices can be typed normally and quickly, with the line total updating live.",
-    "Fixed the version indicator: the version shown at the bottom of the sidebar now correctly reflects the installed release."
+    "Receipts now show the full payment breakdown: every payment with its currency, amount, the actual exchange rate recorded at the time of payment, the USD equivalent, and the payment date. Receipts also update when further payments are made against a sale, so partial and multi-currency payments are always displayed correctly.",
+    "The sales report now shows payment currency and exchange-rate details per sale, including a clear per-payment breakdown when a sale was paid in multiple currencies (e.g. USD + SSP). Outstanding balances remain mathematically consistent and are never treated as paid.",
+    "Fixed the custom unit price field in POS: typing a price (e.g. 6.67) no longer makes the input lose focus or reset; the field keeps focus and every keystroke, with the line total updating live."
   ],
-  "url": "https://github.com/adventure766/dahav/releases/download/v1.0.4/DAHAV-1.0.4.zip",
-  "sha256": "f5822c02d01c79ebb098c4e6ce91873563c6bc16d56b04583c767adb992f0f83",
+  "url": "https://github.com/adventure766/dahav/releases/download/v1.0.5/DAHAV-1.0.5.zip",
+  "sha256": "02b1d072fd5f544dd7b61396ba1f7e4a665d1bb0bd6e84e8ff75591530bb3826",
   "min_version": "1.0.0"
 }
